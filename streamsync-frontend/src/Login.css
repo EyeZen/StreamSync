@@ -1,0 +1,84 @@
+.Login {
+  --theme_color-dark: rgb(31, 29, 29);
+  --theme_color-light: rgb(56, 56, 56);
+  
+  border: 1px solid black;
+  height: calc(100vh - 2px);
+  /* background-image: url('./assets/video-stream0.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; */
+  position: relative;
+
+  background-image: url('./assets/video-stream0.jpg');
+}
+.Login::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* background: black;
+  opacity: 0.30; */
+  background-image: linear-gradient(black, transparent, transparent, transparent, transparent, black);
+}
+
+.Login--Room__card {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+.Login--Room__card-body {
+  /* border: 2px solid white;
+  border-radius: 10px;
+  overflow: hidden; */
+
+  background-color: var(--theme_color-dark);
+}
+.Login--Room__card header {
+  display: flex;
+}
+.Login--Room__header-tab {
+  flex: 1;
+  background-color: var(--theme_color-light);
+  /* border: 1px solid white; */
+  text-align: center;
+  padding-block: 1rem;
+}
+.Login--Room__card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 10vmax;
+}
+.Login--Room__card-item p {
+  padding-inline: 2rem;
+  font-size: larger;
+  font-weight: bold;
+  flex: 1;
+}
+.Login--Room__card-item input {
+  flex: 1;
+  margin: 1rem;
+  width: 80%;
+  padding: 0.5rem;
+  text-align: center;
+  border: none;
+}
+.Login--Room__card-item input::placeholder {
+  text-align: center;
+  font-weight: bold;
+}
+.Login--Room__card-item input:focus {
+  outline: none;
+}
+.Login--Room__card-item button {
+  width: 100%;
+  text-align: center;
+  border: none;
+  padding-block: 0.5rem;
+  background-color: red;
+  font-weight: bold;
+  color: white;
+}

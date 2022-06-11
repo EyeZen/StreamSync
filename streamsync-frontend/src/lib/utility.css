@@ -1,0 +1,27 @@
+
+:root {
+    --screen-height: calc( 100vh - 2px );
+}
+/* //////////////////////////// */
+.hidden {
+    display: none;
+}
+.visible {
+    display: block;
+}
+.center-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.clickable {
+    cursor: pointer; 
+    user-select: none;
+}
+.clickable:active {
+    opacity: 0.75;
+}
+.active-tab {
+    background-color: var(--theme_color-dark);
+}

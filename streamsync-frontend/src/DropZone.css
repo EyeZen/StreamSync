@@ -1,0 +1,13 @@
+.DropZone {
+    /* width: 100%;
+    height: 100%; */
+    background-color: black;
+    box-shadow: 0 0 10px #444;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100px;
+    flex: 1;
+}

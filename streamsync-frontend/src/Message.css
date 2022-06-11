@@ -1,0 +1,33 @@
+
+
+.Message {
+    display: flex;
+    margin-bottom: 1em;
+}
+.Message-logo-container {
+    width: 2.5em;
+}
+.Message-logo {
+    width: 2.5em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: white;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.Message-body {
+    flex: 1;
+    margin-left: 0.5em;
+}
+.Message-title {
+    display: flex;
+}
+.Message-sender {
+    font-weight: bold;
+    font-size: large;
+}
+.Message-content {
+    font-size: 0.9em;
+}

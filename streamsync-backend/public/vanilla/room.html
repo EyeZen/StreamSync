@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room</title>
+
+    <!--  videojs css  -->
+    <link href="https://vjs.zencdn.net/7.19.2/video-js.css" rel="stylesheet" />    
+    <!-- City -->
+    <link
+    href="https://unpkg.com/@videojs/themes@1/dist/city/index.css"
+    rel="stylesheet"
+    />
+</head>
+<style>
+    #video-container {
+        width: 400px;
+        height: 320px;
+    }
+    #video-dropzone {
+        width: 100%;
+        height: 100%;
+        background-color: black;
+    }
+    #drop__prompt {
+        color: white;
+    }
+    .center-items {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .invisible {
+        display: none;
+    }
+    #video {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<body>
+    <h1 id="room-title">Room Title</h1>
+    <h2 id="username">User Name</h2>
+
+    <form action="#" id="video-form" method="post" enctype="multipart/form-data" class="">
+        <span id="video-container" class="center-items">
+            <div id="video-dropzone" class="center-items">
+                <input type="file" name="videoFile" id="video-input" class="invisible" />
+                <span id="drop__prompt">
+                    Drop file here or click upload
+                </span>
+            </div>
+            <video id="video" class="video-js invisible"></video>
+        </span>
+        <button type="submit" id="btn-submit">upload</button>
+    </form>
+
+    <script src="https://vjs.zencdn.net/7.19.2/video.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="store.js"></script>
+    <script src="utils.js"></script>
+    <script src="room.js"></script>
+</body>
+</html>
