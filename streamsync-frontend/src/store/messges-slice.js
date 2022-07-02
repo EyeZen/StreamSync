@@ -5,23 +5,27 @@ const messagesSlice = createSlice({
     initialState: {totalCount: 0, chats: [], index: -1},
     reducers: {
         addMessage(state, action) {
-            window.env.DEBUG && console.log('messages-addMessage', action.payload)
-            state.chats.push(action.payload)
-            state.totalCount++;
+            window.env.DEBUG && console.log('messages-addMessage', action.payload);
+            if(action.payload && !state.chats.some(chat => chat.sender===action.payload.sender && chat.when===action.payload.when)) {
+                state.chats.push(action.payload);
+                state.totalCount = state.chats.length;
+            }
         },
         // push-front
         unshifMessage(state, action) {
-            window.env.DEBUG && console.log('messages-unshiftMessage', action.payload)
-            state.chats.unshift(action.payload)
-            state.totalCount++;
+            window.env.DEBUG && console.log('messages-unshiftMessage', action.payload);
+            if(action.payload && !state.chats.some(chat => chat.sender===action.payload.sender && chat.when===action.payload.when)) {
+                state.chats.unshift(action.payload);
+                state.totalCount = state.chats.length;
+            }
         },
         setCount(state, action) {
-            window.env.DEBUG && console.log('messages-setCount', action.payload)
-            state.totalCount = action.payload
+            window.env.DEBUG && console.log('messages-setCount', action.payload);
+            state.totalCount = action.payload;
         },
         setIndex(state, action) {
-            window.env.DEBUG && console.log('messages-setIndex', action.payload)
-            state.index = action.payload
+            window.env.DEBUG && console.log('messages-setIndex', action.payload);
+            state.index = action.payload;
         }
     }
 })

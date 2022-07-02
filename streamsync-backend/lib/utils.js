@@ -65,7 +65,7 @@ function generateRoomName() {
     
     const roomname = name_start_arr[name_start_index] + name_end_arr[name_end_index];
 
-    return roomname;
+    return roomname.split(' ').join('');
 }
 
 function shuffle(o){ 

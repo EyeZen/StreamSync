@@ -1,10 +1,20 @@
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
+
+const whitelist = ["http://localhost:3006","http://localhost:5500"]
 const io = require('socket.io')(server, {
     cors: {
-      origin: "http://localhost:3006",
-      methods: ["GET", "POST"]
+        //   origin: "http://localhost:3006",
+        origin: "*",
+        // origin: function (origin, callback) {
+        //     if (whitelist.indexOf(origin) !== -1) {
+        //         callback(null, true)
+        //     } else {
+        //         callback(new Error('Not allowed by CORS'))
+        //     }
+        // },
+        methods: ["GET", "POST"]
     }
   });
 
@@ -71,6 +81,23 @@ app.use('/', express.static('public'))
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true}))
 
+// const ROOMS = {};
+// function fillRooms(rooms, user, socket) {
+//     for(const room of rooms) {
+//         ROOMS[room] = ROOMS[room] ?? [];
+//         ROOMS[room].push({user: user.name, socket});
+//     }
+// }
+
+// const unset = setInterval(() => {
+//     // send to everyone except sender
+//     // ROOMS['amplejockies'] && ROOMS['amplejockies'][0].socket.in('amplejockies').emit(EVENTS.NEW_MSG, {sender: 'admin', message: 'admin-message', when: Date.now()})
+//     // send to everyone in the room/group
+//     // io.to('amplejockies').emit(EVENTS.NEW_MSG, {sender: 'admin', message: 'admin-message', when: Date.now()})
+//     console.log('admin-msg-sent')
+// }, 500);
+// clearInterval(unset);
+
 /**
  * 
  * @param {User} user 
@@ -112,7 +139,10 @@ io.on(EVENTS.IO_CONNECT, socket => {
                     user_doc = await new User({ name: utils.generateName(), room: '' }).save()
                 } else { // old-user
                     user_doc = await User.findOne(user)
+                    if(user_doc.room) socket.join(user_doc.room);
                 }
+                
+                // fillRooms([...socket.rooms], user_doc, socket);
                 socket.emit(EVENTS.INITIALIZE, user_doc)
             } catch(err) {
                 console.log(err);
@@ -127,18 +157,26 @@ io.on(EVENTS.IO_CONNECT, socket => {
         process.env.DEBUG && console.log(EVENTS.CREATE_ROOM, packet);
         (async()=>{
             try {
-                const room = { name: utils.generateRoomName() }
-                const room_doc = await ensureRoom(room)
+                const room = { name: utils.generateRoomName() };
+                const room_doc = await ensureRoom(room);
+                // todo: handle error
+                // throws 'Invalid User' error and does not reach next line
                 const user_doc = await addUserToRoom(packet.user, room_doc);
                 if(user_doc.err || room_doc.err) {
-                    if(room_doc.err) await Room.findOneAndDelete(room);
+                    if(room_doc.err) await Room.findOneAndDelete(room_doc);
                     throw new Error('failed to create new room')
                 }
                 /** JOINED ROOM USING ID */
-                socket.join(room_doc._id);
+                socket.join(room_doc.name);
                 socket.emit(EVENTS.CREATE_ROOM, user_doc);
                 // console.debug(user_doc);
             } catch (err) {
+                /*
+                    throws 'Invalid User'
+                    todo : check if room is empty, if yes then delete else don't
+                    current: trying to delete the room
+                */
+
                 console.error(err);
                 socket.emit(EVENTS.RETRY, { err: 'something went wrong! please retry!', src_event: EVENTS.CREATE_ROOM });
             }
@@ -155,7 +193,7 @@ io.on(EVENTS.IO_CONNECT, socket => {
                     throw new Error('failed to join room')
                 }
                 /** JOINED ROOM USING ID */
-                socket.join(room_doc._id);
+                socket.join(room_doc.name);
                 socket.emit(EVENTS.JOIN_ROOM, user_doc);
             } catch (err) {
                 console.error(err);
@@ -178,7 +216,7 @@ io.on(EVENTS.IO_CONNECT, socket => {
                 const new_msg = { 
                     message: packet.message, 
                     sender: packet.user.name, 
-                    when: Date.now()
+                    when: parseInt(packet.when ?? Date.now())
                 }
                 console.log('message to be sent', new_msg)
                 const result = await Room.findByIdAndUpdate(room_doc._id, {$push: { messages: new_msg}}, {new:true})
@@ -186,7 +224,8 @@ io.on(EVENTS.IO_CONNECT, socket => {
                 
                 // socket.in(room_doc._id).emit(EVENTS.NEW_MSG, new_msg )
                 // console.log(' reaches here ');
-                socket.emit(EVENTS.NEW_MSG, new_msg);
+                socket.to(room_doc.name).emit(EVENTS.NEW_MSG, new_msg);
+                console.log('message sent in room', room_doc.name);
             } catch (err) {
                 console.error(err);
                 socket.emit(EVENTS.RETRY, { err: 'failed to send meessage! please retry', src_event: EVENTS.SEND_MSG })
@@ -305,7 +344,7 @@ app.get('/messages/:room_name', (req, res, next) => {
     const index = Number(req.query.index);
     let result = null;
 
-    process.env.DEBUG && console.log({index, room_name});
+    process.env.DEBUG && console.log('/messages/:room_name', {index, room_name});
 
     (async() => {
         try {
@@ -316,9 +355,9 @@ app.get('/messages/:room_name', (req, res, next) => {
                 const count = room_docs.messages.length;
                 result = { index: count};
             } else {
-                const messages = room_docs.messages.slice(index-res_arr_size, index)
+                const messages = room_docs.messages.slice(Math.max(index-res_arr_size, 0), index)
                 const new_index = (index - res_arr_size) < 0 ? -1 : (index - res_arr_size)
-                result = { index: new_index, count: res_arr_size ,messages};
+                result = { index: new_index, count: Math.min(res_arr_size, room_docs.messages.length) ,messages};
             }
 
             process.env.DEBUG && console.log(result)

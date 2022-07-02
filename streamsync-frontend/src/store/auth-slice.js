@@ -21,6 +21,7 @@ const authSlice = createSlice({
             } else {
                 window.env.DEBUG && console.log('login rejected');
             }
+            console.log('user', { _id: state._id, name: state.name, room: state.room});
         },
         logout(state, action){
             window.env.DEBUG && console.log('auth-logout', action)
